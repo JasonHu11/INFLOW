@@ -8,24 +8,31 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\3picP\\.nuget\\packages\\": {}
+    "C:\\Users\\RK03-B1225\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\3picP\\OneDrive\\Projects\\inflow\\BlazorApp1\\BlazorApp1.csproj",
+      "projectUniqueName": "C:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\BlazorApp1.csproj",
       "projectName": "BlazorApp1",
-      "projectPath": "C:\\Users\\3picP\\OneDrive\\Projects\\inflow\\BlazorApp1\\BlazorApp1.csproj",
-      "packagesPath": "C:\\Users\\3picP\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\3picP\\OneDrive\\Projects\\inflow\\BlazorApp1\\obj\\",
+      "projectPath": "C:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\BlazorApp1.csproj",
+      "packagesPath": "C:\\Users\\RK03-B1225\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\3picP\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\RK03-B1225\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -67,7 +74,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.402/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

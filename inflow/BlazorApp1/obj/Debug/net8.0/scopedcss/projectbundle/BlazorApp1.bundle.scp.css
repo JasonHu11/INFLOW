@@ -201,6 +201,10 @@ main[b-j65y7q72mt] {
         overflow-y: auto;
     }
 }
+/* _content/BlazorApp1/Components/Pages/Active.razor.rz.scp.css */
+*[b-p075kfq9nk] {
+    color: white;
+}
 /* _content/BlazorApp1/Components/Pages/Home.razor.rz.scp.css */
 /* Center content both vertically and horizontally */
 .center-content[b-x0adpbawup] {
@@ -210,4 +214,8 @@ main[b-j65y7q72mt] {
     align-items: center; /* Centers horizontally */
     height: 80vh; /* Full viewport height */
     text-align: center; /* Ensures text is centered */
+}
+
+.upload-section[b-x0adpbawup] {
+    justify-content: center;
 }

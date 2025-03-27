@@ -1,0 +1,65 @@
+﻿@page "/activity"
+@using YourProjectName.Services
+@implements IDisposable
+@inject NavigationManager Navigation
+
+<PageTitle>CSV Data</PageTitle>
+
+<h1>CSV Data Viewer</h1>
+
+@if (CsvDataService.Headers == null || CsvDataService.CsvData == null)
+{
+    <div class="alert alert-warning">
+        No data available. <a href="/" class="alert-link">Upload a CSV file</a>.
+    </div>
+}
+else
+{
+    <div class="mb-3">
+        <button @onclick="ReturnToUpload" class="btn btn-primary">
+            ← Upload New File
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    @foreach (var header in CsvDataService.Headers)
+                    {
+                        <th>@header</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < CsvDataService.CsvData.Count; i++)
+                {
+                    <tr>
+                        @foreach (var cell in CsvDataService.CsvData[i])
+                        {
+                            <td>@cell</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        CsvDataService.DataLoaded += StateHasChanged;
+    }
+
+    private void ReturnToUpload()
+    {
+        CsvDataService.ClearData();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        CsvDataService.DataLoaded -= StateHasChanged;
+    }
+}
