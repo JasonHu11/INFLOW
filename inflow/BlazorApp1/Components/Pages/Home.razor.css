@@ -1,0 +1,9 @@
+/* Center content both vertically and horizontally */
+.center-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers vertically */
+    align-items: center; /* Centers horizontally */
+    height: 80vh; /* Full viewport height */
+    text-align: center; /* Ensures text is centered */
+}
