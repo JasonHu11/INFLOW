@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "JrMEMfXH3iiTgLydDuGybE+L12Zmtto5WnlZdSSdhiQ=",
+  "Hash": "VJ7D+yY8VYhgdcKtd/s5FdlaYwE9zbKpKxCasve2iEk=",
   "Source": "BlazorApp1",
   "BasePath": "_content/BlazorApp1",
   "Mode": "Default",
@@ -10,17 +10,55 @@
     {
       "Name": "BlazorApp1\\wwwroot",
       "Source": "BlazorApp1",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
       "BasePath": "_content/BlazorApp1",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BlazorApp1.styles.css",
+      "Identity": "C:\\Users\\RK03-B1225\\.nuget\\packages\\mudblazor\\8.5.1\\staticwebassets\\MudBlazor.min.css",
+      "SourceId": "MudBlazor",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\RK03-B1225\\.nuget\\packages\\mudblazor\\8.5.1\\staticwebassets\\",
+      "BasePath": "_content/MudBlazor",
+      "RelativePath": "MudBlazor.min.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\RK03-B1225\\.nuget\\packages\\mudblazor\\8.5.1\\staticwebassets\\MudBlazor.min.css"
+    },
+    {
+      "Identity": "C:\\Users\\RK03-B1225\\.nuget\\packages\\mudblazor\\8.5.1\\staticwebassets\\MudBlazor.min.js",
+      "SourceId": "MudBlazor",
+      "SourceType": "Package",
+      "ContentRoot": "C:\\Users\\RK03-B1225\\.nuget\\packages\\mudblazor\\8.5.1\\staticwebassets\\",
+      "BasePath": "_content/MudBlazor",
+      "RelativePath": "MudBlazor.min.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "C:\\Users\\RK03-B1225\\.nuget\\packages\\mudblazor\\8.5.1\\staticwebassets\\MudBlazor.min.js"
+    },
+    {
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BlazorApp1.styles.css",
       "SourceId": "BlazorApp1",
       "SourceType": "Computed",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\bundle\\",
       "BasePath": "_content/BlazorApp1",
       "RelativePath": "BlazorApp1.styles.css",
       "AssetKind": "All",
@@ -33,13 +71,13 @@
       "AssetTraitValue": "ApplicationBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BlazorApp1.styles.css"
+      "OriginalItemSpec": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\bundle\\BlazorApp1.styles.css"
     },
     {
-      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BlazorApp1.bundle.scp.css",
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BlazorApp1.bundle.scp.css",
       "SourceId": "BlazorApp1",
       "SourceType": "Computed",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\",
       "BasePath": "_content/BlazorApp1",
       "RelativePath": "BlazorApp1.bundle.scp.css",
       "AssetKind": "All",
@@ -52,13 +90,13 @@
       "AssetTraitValue": "ProjectBundle",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BlazorApp1.bundle.scp.css"
+      "OriginalItemSpec": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\obj\\Debug\\net8.0\\scopedcss\\projectbundle\\BlazorApp1.bundle.scp.css"
     },
     {
-      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\app.css",
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\app.css",
       "SourceId": "BlazorApp1",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
       "BasePath": "_content/BlazorApp1",
       "RelativePath": "app.css",
       "AssetKind": "All",
@@ -74,10 +112,10 @@
       "OriginalItemSpec": "wwwroot\\app.css"
     },
     {
-      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\bootstrap\\bootstrap.min.css",
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\bootstrap\\bootstrap.min.css",
       "SourceId": "BlazorApp1",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
       "BasePath": "_content/BlazorApp1",
       "RelativePath": "bootstrap/bootstrap.min.css",
       "AssetKind": "All",
@@ -93,10 +131,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css"
     },
     {
-      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\bootstrap\\bootstrap.min.css.map",
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\bootstrap\\bootstrap.min.css.map",
       "SourceId": "BlazorApp1",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
       "BasePath": "_content/BlazorApp1",
       "RelativePath": "bootstrap/bootstrap.min.css.map",
       "AssetKind": "All",
@@ -112,10 +150,10 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
-      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\favicon.png",
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\favicon.png",
       "SourceId": "BlazorApp1",
       "SourceType": "Discovered",
-      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
       "BasePath": "_content/BlazorApp1",
       "RelativePath": "favicon.png",
       "AssetKind": "All",
@@ -129,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.png"
+    },
+    {
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\js\\activityCharts.js",
+      "SourceId": "BlazorApp1",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "BasePath": "_content/BlazorApp1",
+      "RelativePath": "js/activityCharts.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\activityCharts.js"
     }
   ]
 }

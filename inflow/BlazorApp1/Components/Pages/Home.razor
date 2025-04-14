@@ -48,15 +48,18 @@
 
             CsvDataService.Headers = lines[0].Split(',').ToList();
             CsvDataService.CsvData = lines.Skip(1)
-                                       .Where(line => !string.IsNullOrWhiteSpace(line))
-                                       .Select(line => line.Split(','))
-                                       .ToList();
+                                        .Where(line => !string.IsNullOrWhiteSpace(line))
+                                        .Select(line => line.Split(','))
+                                        .ToList();
 
             Navigation.NavigateTo("/activity");
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error processing CSV");
+            // Display error message to the user
+            _isLoading = false;
+            StateHasChanged();
         }
         finally
         {

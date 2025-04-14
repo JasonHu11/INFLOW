@@ -1,11 +1,13 @@
 ﻿@page "/activity"
-@using YourProjectName.Services
+@using System.Linq
 @implements IDisposable
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 
-<PageTitle>CSV Data</PageTitle>
 
-<h1>CSV Data Viewer</h1>
+<PageTitle>Activity Analysis</PageTitle>
+
+<h1>Activity Analysis Dashboard</h1>
 
 @if (CsvDataService.Headers == null || CsvDataService.CsvData == null)
 {
@@ -21,6 +23,61 @@ else
         </button>
     </div>
 
+    <div id="activitySummary" class="mb-4">
+        <h2>Activity Summary</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">Top 5 Most Active Users</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var user in TopUsers)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @TruncateString(user.Key)
+                                    <span class="badge bg-primary rounded-pill">@user.Value</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">Top 5 Most Active Panels</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var panel in TopPanels)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @TruncateString(panel.Key)
+                                    <span class="badge bg-success rounded-pill">@panel.Value</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">Top 5 Most Active Readers</div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            @foreach (var reader in TopReaders)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    @TruncateString(reader.Key)
+                                    <span class="badge bg-info rounded-pill">@reader.Value</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Raw Data</h2>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="table-dark">
@@ -32,7 +89,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < CsvDataService.CsvData.Count; i++)
+                @for (int i = 0; i < Math.Min(CsvDataService.CsvData.Count, 100); i++)
                 {
                     <tr>
                         @foreach (var cell in CsvDataService.CsvData[i])
@@ -43,13 +100,106 @@ else
                 }
             </tbody>
         </table>
+        @if (CsvDataService.CsvData.Count > 100)
+        {
+            <div class="alert alert-info">
+                Showing first 100 rows of @CsvDataService.CsvData.Count total.
+            </div>
+        }
     </div>
 }
 
 @code {
+    private Dictionary<string, int> userCounts = new Dictionary<string, int>();
+    private Dictionary<string, int> panelCounts = new Dictionary<string, int>();
+    private Dictionary<string, int> readerCounts = new Dictionary<string, int>();
+
+    private List<KeyValuePair<string, int>> TopUsers => userCounts.OrderByDescending(x => x.Value).Take(5).ToList();
+    private List<KeyValuePair<string, int>> TopPanels => panelCounts.OrderByDescending(x => x.Value).Take(5).ToList();
+    private List<KeyValuePair<string, int>> TopReaders => readerCounts.OrderByDescending(x => x.Value).Take(5).ToList();
+
     protected override void OnInitialized()
     {
-        CsvDataService.DataLoaded += StateHasChanged;
+        CsvDataService.DataLoaded += OnDataLoaded;
+    }
+
+    private void OnDataLoaded()
+    {
+        ProcessData();
+        StateHasChanged();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && CsvDataService.Headers != null && CsvDataService.CsvData != null && 
+            CsvDataService.CsvData.Count > 0)
+        {
+            ProcessData();
+            StateHasChanged();
+        }
+    }
+
+    private void ProcessData()
+    {
+        try
+        {
+            // Find column indices
+            int idHashIndex = CsvDataService.Headers.IndexOf("IDHASH");
+            int readerDescIndex = CsvDataService.Headers.IndexOf("READERDESC");
+            int locationIndex = CsvDataService.Headers.IndexOf("LOCATION");
+
+            // Reset dictionaries
+            userCounts = new Dictionary<string, int>();
+            panelCounts = new Dictionary<string, int>();
+            readerCounts = new Dictionary<string, int>();
+
+            if (idHashIndex != -1 && readerDescIndex != -1 && locationIndex != -1)
+            {
+                // Count occurrences
+                foreach (var row in CsvDataService.CsvData)
+                {
+                    if (row.Length > Math.Max(Math.Max(idHashIndex, readerDescIndex), locationIndex))
+                    {
+                        string userId = row[idHashIndex];
+                        string reader = row[readerDescIndex];
+                        string panel = row[locationIndex];
+
+                        if (!string.IsNullOrEmpty(userId))
+                        {
+                            if (!userCounts.ContainsKey(userId))
+                                userCounts[userId] = 0;
+                            userCounts[userId]++;
+                        }
+
+                        if (!string.IsNullOrEmpty(panel))
+                        {
+                            if (!panelCounts.ContainsKey(panel))
+                                panelCounts[panel] = 0;
+                            panelCounts[panel]++;
+                        }
+
+                        if (!string.IsNullOrEmpty(reader))
+                        {
+                            if (!readerCounts.ContainsKey(reader))
+                                readerCounts[reader] = 0;
+                            readerCounts[reader]++;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error processing data: {ex.Message}");
+            
+        }
+    }
+
+    // Helper to truncate long strings for better display
+    private string TruncateString(string value, int maxLength = 30)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+        return value.Length <= maxLength ? value : value.Substring(0, maxLength) + "...";
     }
 
     private void ReturnToUpload()
@@ -60,6 +210,6 @@ else
 
     public void Dispose()
     {
-        CsvDataService.DataLoaded -= StateHasChanged;
+        CsvDataService.DataLoaded -= OnDataLoaded;
     }
 }
