@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "VJ7D+yY8VYhgdcKtd/s5FdlaYwE9zbKpKxCasve2iEk=",
+  "Hash": "AZ657l/TYdkae72A1CDgZOgoBeDAl5J65TIDbH3PRwQ=",
   "Source": "BlazorApp1",
   "BasePath": "_content/BlazorApp1",
   "Mode": "Default",
@@ -150,6 +150,25 @@
       "OriginalItemSpec": "wwwroot\\bootstrap\\bootstrap.min.css.map"
     },
     {
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\chartHelper.js",
+      "SourceId": "BlazorApp1",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "BasePath": "_content/BlazorApp1",
+      "RelativePath": "chartHelper.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\chartHelper.js"
+    },
+    {
       "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\favicon.png",
       "SourceId": "BlazorApp1",
       "SourceType": "Discovered",
@@ -186,6 +205,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\activityCharts.js"
+    },
+    {
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\js\\site.js",
+      "SourceId": "BlazorApp1",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "BasePath": "_content/BlazorApp1",
+      "RelativePath": "js/site.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\site.js"
     }
   ]
 }

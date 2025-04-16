@@ -4,8 +4,7 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
-
-<PageTitle>Activity Analysis</PageTitle>
+<PageTitle>Activity Analysis Dashboard</PageTitle>
 
 <h1>Activity Analysis Dashboard</h1>
 
@@ -23,6 +22,29 @@ else
         </button>
     </div>
 
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    User Activity Over Time
+                </div>
+                <div class="card-body">
+                    <div id="activityTimeChart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    Panel Usage Distribution
+                </div>
+                <div class="card-body">
+                    <div id="panelPieChart" style="height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="activitySummary" class="mb-4">
         <h2>Activity Summary</h2>
         <div class="row">
@@ -30,7 +52,8 @@ else
                 <div class="card mb-3">
                     <div class="card-header bg-primary text-white">Top 5 Most Active Users</div>
                     <div class="card-body">
-                        <ul class="list-group">
+                        <div id="userBarChart" style="height: 200px;"></div>
+                        <ul class="list-group mt-2">
                             @foreach (var user in TopUsers)
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -46,7 +69,8 @@ else
                 <div class="card mb-3">
                     <div class="card-header bg-success text-white">Top 5 Most Active Panels</div>
                     <div class="card-body">
-                        <ul class="list-group">
+                        <div id="panelBarChart" style="height: 200px;"></div>
+                        <ul class="list-group mt-2">
                             @foreach (var panel in TopPanels)
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -62,7 +86,8 @@ else
                 <div class="card mb-3">
                     <div class="card-header bg-info text-white">Top 5 Most Active Readers</div>
                     <div class="card-body">
-                        <ul class="list-group">
+                        <div id="readerBarChart" style="height: 200px;"></div>
+                        <ul class="list-group mt-2">
                             @foreach (var reader in TopReaders)
                             {
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -72,6 +97,19 @@ else
                             }
                         </ul>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    Activity Heatmap (by Hour of Day)
+                </div>
+                <div class="card-body">
+                    <div id="heatmapChart" style="height: 250px;"></div>
                 </div>
             </div>
         </div>
@@ -113,6 +151,16 @@ else
     private Dictionary<string, int> userCounts = new Dictionary<string, int>();
     private Dictionary<string, int> panelCounts = new Dictionary<string, int>();
     private Dictionary<string, int> readerCounts = new Dictionary<string, int>();
+    private Dictionary<string, Dictionary<int, int>> hourlyActivity = new Dictionary<string, Dictionary<int, int>>();
+    private List<ActivityTimeEntry> activityTimeData = new List<ActivityTimeEntry>();
+    private bool jsInitialized = false;
+    private bool chartsRendered = false;  // Add this line
+
+    private class ActivityTimeEntry
+    {
+        public DateTime Date { get; set; }
+        public int Count { get; set; }
+    }
 
     private List<KeyValuePair<string, int>> TopUsers => userCounts.OrderByDescending(x => x.Value).Take(5).ToList();
     private List<KeyValuePair<string, int>> TopPanels => panelCounts.OrderByDescending(x => x.Value).Take(5).ToList();
@@ -126,16 +174,525 @@ else
     private void OnDataLoaded()
     {
         ProcessData();
+        chartsRendered = false;  // Reset flag when new data is loaded
         StateHasChanged();
     }
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && CsvDataService.Headers != null && CsvDataService.CsvData != null && 
-            CsvDataService.CsvData.Count > 0)
+            if (firstRender) {
+                await InitializeJSLibraries();
+            }
+
+            if (jsInitialized && CsvDataService.Headers != null && CsvDataService.CsvData != null && 
+                CsvDataService.CsvData.Count > 0 && !chartsRendered)
+            {
+                try {
+                    chartsRendered = true;
+                    await RenderChartsAsync();
+                }
+                catch (Exception ex) {
+                    Console.WriteLine($"Error rendering charts: {ex.Message}");
+                    // In case of error, we might want to allow a retry
+                    chartsRendered = false;
+                }
+            }
+        }
+
+    private async Task InitializeJSLibraries()
+    {
+        try
         {
-            ProcessData();
-            StateHasChanged();
+            
+            // Add this to your InitializeJSLibraries method
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                // Bar Chart Renderer - updated for canvas
+                window.renderBarChart = function(elementId, labels, data, backgroundColor) {
+                    console.log(`Rendering bar chart for ${elementId}`);
+                    const ctx = document.getElementById(elementId);
+                    if (!ctx) {
+                        console.error(`Element ${elementId} not found`);
+                        return;
+                    }
+                    
+                    // Log data for debugging
+                    console.log(`Labels: ${labels.join(', ')}`);
+                    console.log(`Data: ${data.join(', ')}`);
+                    
+                    // Destroy existing chart if it exists
+                    if (window.chartInstances[elementId]) {
+                        window.chartInstances[elementId].destroy();
+                    }
+                    
+                    try {
+                        window.chartInstances[elementId] = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Count',
+                                    data: data,
+                                    backgroundColor: backgroundColor,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                        console.log(`Chart rendered successfully for ${elementId}`);
+                    } catch (error) {
+                        console.error(`Error rendering chart for ${elementId}: ${error.message}`);
+                    }
+                };
+
+                // Time Series Chart Renderer - updated for canvas
+                window.renderTimeChart = function(elementId, dates, counts) {
+                    console.log(`Rendering time chart for ${elementId}`);
+                    const ctx = document.getElementById(elementId);
+                    if (!ctx) {
+                        console.error(`Element ${elementId} not found`);
+                        return;
+                    }
+                    
+                    // Log data for debugging
+                    console.log(`Dates: ${dates.length > 0 ? dates[0] + '...' + dates[dates.length-1] : 'none'}`);
+                    console.log(`Counts: ${counts.length} values`);
+                    
+                    // Destroy existing chart if it exists
+                    if (window.chartInstances[elementId]) {
+                        window.chartInstances[elementId].destroy();
+                    }
+                    
+                    try {
+                        window.chartInstances[elementId] = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: dates,
+                                datasets: [{
+                                    label: 'Activity Count',
+                                    data: counts,
+                                    fill: false,
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true
+                                    }
+                                }
+                            }
+                        });
+                        console.log(`Time chart rendered successfully for ${elementId}`);
+                    } catch (error) {
+                        console.error(`Error rendering time chart: ${error.message}`);
+                    }
+                };
+
+                // Pie Chart Renderer - updated for canvas
+                window.renderPieChart = function(elementId, labels, data) {
+                    console.log(`Rendering pie chart for ${elementId}`);
+                    const ctx = document.getElementById(elementId);
+                    if (!ctx) {
+                        console.error(`Element ${elementId} not found`);
+                        return;
+                    }
+                    
+                    // Log data for debugging
+                    console.log(`Labels: ${labels.join(', ')}`);
+                    console.log(`Data: ${data.join(', ')}`);
+                    
+                    // Destroy existing chart if it exists
+                    if (window.chartInstances[elementId]) {
+                        window.chartInstances[elementId].destroy();
+                    }
+
+                    try {
+                        // Generate colors
+                        const backgroundColors = labels.map((_, i) => {
+                            const hue = (i * 360 / labels.length) % 360;
+                            return `hsla(${hue}, 70%, 60%, 0.8)`;
+                        });
+                        
+                        window.chartInstances[elementId] = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    data: data,
+                                    backgroundColor: backgroundColors,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'right',
+                                        labels: {
+                                            boxWidth: 12
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                        console.log(`Pie chart rendered successfully for ${elementId}`);
+                    } catch (error) {
+                        console.error(`Error rendering pie chart: ${error.message}`);
+                    }
+                };
+                
+                // Add testing function
+                window.testCharts = function() {
+                    console.log('Testing chart rendering with sample data');
+                    
+                    // Test bar chart
+                    renderBarChart('userBarChart', 
+                        ['User1', 'User2', 'User3'], 
+                        [25, 15, 10],
+                        'rgba(13, 110, 253, 0.8)');
+                        
+                    // Test pie chart
+                    renderPieChart('panelPieChart',
+                        ['Panel1', 'Panel2', 'Panel3'],
+                        [45, 30, 25]);
+                        
+                    // Test time chart
+                    renderTimeChart('activityTimeChart',
+                        ['2023-01-01', '2023-01-02', '2023-01-03'],
+                        [5, 12, 8]);
+                        
+                    console.log('Test chart rendering complete');
+                };
+            ");
+            await JSRuntime.InvokeVoidAsync("eval", @"
+                // Load required libraries
+                function loadScript(url, callback) {
+                    var script = document.createElement('script');
+                    script.type = 'text/javascript';
+                    script.src = url;
+                    script.onload = callback;
+                    document.head.appendChild(script);
+                }
+
+                // Load CSS
+                function loadCSS(url) {
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.type = 'text/css';
+                    link.href = url;
+                    document.head.appendChild(link);
+                }
+
+                // Load Chart.js first
+                loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js', function() {
+                    // Then load D3.js for heatmap
+                    loadScript('https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js', function() {
+                        console.log('Chart libraries loaded');
+                        window.chartLibrariesLoaded = true;
+                        
+                        // Dispatch event when libraries are loaded
+                        document.dispatchEvent(new Event('chartLibrariesLoaded'));
+                    });
+                });
+                
+                // Global chart references
+                window.chartInstances = {};
+
+                // Bar Chart Renderer
+                window.renderBarChart = function(elementId, labels, data, backgroundColor) {
+                    const ctx = document.getElementById(elementId);
+                    if (!ctx) return;
+                    
+                    // Destroy existing chart if it exists
+                    if (window.chartInstances[elementId]) {
+                        window.chartInstances[elementId].destroy();
+                    }
+                    
+                    window.chartInstances[elementId] = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Count',
+                                data: data,
+                                backgroundColor: backgroundColor,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                };
+
+                // Time Series Chart Renderer
+                window.renderTimeChart = function(elementId, dates, counts) {
+                    const ctx = document.getElementById(elementId);
+                    if (!ctx) return;
+                    
+                    // Destroy existing chart if it exists
+                    if (window.chartInstances[elementId]) {
+                        window.chartInstances[elementId].destroy();
+                    }
+                    
+                    window.chartInstances[elementId] = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Activity Count',
+                                data: counts,
+                                fill: false,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                };
+
+                // Pie Chart Renderer
+                window.renderPieChart = function(elementId, labels, data) {
+                    const ctx = document.getElementById(elementId);
+                    if (!ctx) return;
+                    
+                    // Destroy existing chart if it exists
+                    if (window.chartInstances[elementId]) {
+                        window.chartInstances[elementId].destroy();
+                    }
+
+                    // Generate colors
+                    const backgroundColors = labels.map((_, i) => {
+                        const hue = (i * 360 / labels.length) % 360;
+                        return `hsla(${hue}, 70%, 60%, 0.8)`;
+                    });
+                    
+                    window.chartInstances[elementId] = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: data,
+                                backgroundColor: backgroundColors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        boxWidth: 12
+                                    }
+                                }
+                            }
+                        }
+                    });
+                };
+
+                // Heatmap Renderer using D3.js
+                window.renderHeatmap = function(elementId, data) {
+                    // Clear previous chart
+                    const container = document.getElementById(elementId);
+                    if (!container) return;
+                    
+                    container.innerHTML = '';
+                    
+                    // Set dimensions and margins
+                    const margin = {top: 20, right: 30, bottom: 50, left: 70};
+                    const width = container.offsetWidth - margin.left - margin.right;
+                    const height = container.offsetHeight - margin.top - margin.bottom;
+                    
+                    // Find max value for color scale
+                    const maxValue = Math.max(...data.map(d => d.value));
+                    
+                    // Days and hours for scales
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+                    
+                    // Create SVG
+                    const svg = d3.select('#' + elementId)
+                        .append('svg')
+                        .attr('width', width + margin.left + margin.right)
+                        .attr('height', height + margin.top + margin.bottom)
+                        .append('g')
+                        .attr('transform', `translate(${margin.left},${margin.top})`);
+                    
+                    // Create scales
+                    const x = d3.scaleBand()
+                        .range([0, width])
+                        .domain(hours)
+                        .padding(0.01);
+                    
+                    const y = d3.scaleBand()
+                        .range([height, 0])
+                        .domain(days)
+                        .padding(0.01);
+                    
+                    const colorScale = d3.scaleSequential()
+                        .interpolator(d3.interpolateYlOrRd)
+                        .domain([0, maxValue]);
+                    
+                    // Add axes
+                    svg.append('g')
+                       .attr('transform', `translate(0,${height})`)
+                       .call(d3.axisBottom(x).tickValues(x.domain().filter((d, i) => !(i % 2))))
+                       .selectAll('text')
+                       .style('text-anchor', 'end')
+                       .attr('dx', '-.8em')
+                       .attr('dy', '.15em')
+                       .attr('transform', 'rotate(-65)');
+                    
+                    svg.append('g')
+                       .call(d3.axisLeft(y));
+                    
+                    // Add title
+                    svg.append('text')
+                       .attr('x', width / 2)
+                       .attr('y', -5)
+                       .attr('text-anchor', 'middle')
+                       .style('font-size', '14px')
+                       .text('Activity by Day and Hour');
+                    
+                    // Create heatmap cells
+                    svg.selectAll()
+                       .data(data)
+                       .enter()
+                       .append('rect')
+                       .attr('x', d => x(d.hour))
+                       .attr('y', d => y(d.day))
+                       .attr('width', x.bandwidth())
+                       .attr('height', y.bandwidth())
+                       .style('fill', d => d.value === 0 ? '#f8f9fa' : colorScale(d.value))
+                       .attr('stroke', '#e9ecef')
+                       .attr('stroke-width', 1)
+                       .append('title')
+                       .text(d => `${d.day} at ${d.hour}: ${d.value} activities`);
+                    
+                    // Add legend
+                    const legendWidth = 300;
+                    const legendHeight = 20;
+                    
+                    const legend = svg.append('g')
+                        .attr('transform', `translate(${(width - legendWidth) / 2},${height + margin.bottom - 10})`);
+                    
+                    const defs = legend.append('defs');
+                    
+                    const linearGradient = defs.append('linearGradient')
+                        .attr('id', 'heatmap-gradient')
+                        .attr('x1', '0%')
+                        .attr('y1', '0%')
+                        .attr('x2', '100%')
+                        .attr('y2', '0%');
+                    
+                    linearGradient.selectAll('stop')
+                        .data([
+                            {offset: '0%', color: colorScale(0)},
+                            {offset: '25%', color: colorScale(maxValue * 0.25)},
+                            {offset: '50%', color: colorScale(maxValue * 0.5)},
+                            {offset: '75%', color: colorScale(maxValue * 0.75)},
+                            {offset: '100%', color: colorScale(maxValue)}
+                        ])
+                        .enter().append('stop')
+                        .attr('offset', d => d.offset)
+                        .attr('stop-color', d => d.color);
+                    
+                    legend.append('rect')
+                        .attr('width', legendWidth)
+                        .attr('height', legendHeight)
+                        .style('fill', 'url(#heatmap-gradient)');
+                    
+                    legend.append('text')
+                        .attr('x', 0)
+                        .attr('y', legendHeight + 15)
+                        .style('text-anchor', 'start')
+                        .text('0');
+                    
+                    legend.append('text')
+                        .attr('x', legendWidth)
+                        .attr('y', legendHeight + 15)
+                        .style('text-anchor', 'end')
+                        .text(maxValue);
+                    
+                    legend.append('text')
+                        .attr('x', legendWidth / 2)
+                        .attr('y', legendHeight + 15)
+                        .style('text-anchor', 'middle')
+                        .text('Activity Intensity');
+                };
+            ");
+
+            // Set up a way to detect when libraries are loaded
+            var taskCompletionSource = new TaskCompletionSource<bool>();
+            
+            // Check if libraries are already loaded
+            var librariesLoaded = await JSRuntime.InvokeAsync<bool>("eval", "return window.chartLibrariesLoaded === true");
+            
+            if (librariesLoaded)
+            {
+                jsInitialized = true;
+                return;
+            }
+            else
+            {
+                // Set up an event listener for when libraries finish loading
+                await JSRuntime.InvokeVoidAsync("eval", @"
+                    document.addEventListener('chartLibrariesLoaded', function() {
+                        DotNet.invokeMethodAsync('BlazorApp1', 'NotifyLibrariesLoaded');
+                    });
+                ");
+
+                // Wait for a short time to check again
+                await Task.Delay(1000);
+                
+                // Check again if libraries are loaded
+                librariesLoaded = await JSRuntime.InvokeAsync<bool>("eval", "return window.chartLibrariesLoaded === true");
+                jsInitialized = librariesLoaded;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing JS libraries: {ex.Message}");
         }
     }
 
@@ -143,26 +700,57 @@ else
     {
         try
         {
+            Console.WriteLine($"Column indices - ID: {CsvDataService.Headers.IndexOf("IDHASH")}, " +
+            $"Reader: {CsvDataService.Headers.IndexOf("READERDESC")}, " +
+            $"Location: {CsvDataService.Headers.IndexOf("LOCATION")}, " +
+            $"Timestamp: {CsvDataService.Headers.IndexOf("EVENT_TIME_UTC")}");
             // Find column indices
             int idHashIndex = CsvDataService.Headers.IndexOf("IDHASH");
             int readerDescIndex = CsvDataService.Headers.IndexOf("READERDESC");
             int locationIndex = CsvDataService.Headers.IndexOf("LOCATION");
+            int timestampIndex = CsvDataService.Headers.IndexOf("EVENT_TIME_UTC");
 
             // Reset dictionaries
             userCounts = new Dictionary<string, int>();
             panelCounts = new Dictionary<string, int>();
             readerCounts = new Dictionary<string, int>();
+            hourlyActivity = new Dictionary<string, Dictionary<int, int>>();
+            activityTimeData = new List<ActivityTimeEntry>();
+
+            Dictionary<DateTime, int> dailyCounts = new Dictionary<DateTime, int>();
 
             if (idHashIndex != -1 && readerDescIndex != -1 && locationIndex != -1)
             {
                 // Count occurrences
                 foreach (var row in CsvDataService.CsvData)
                 {
-                    if (row.Length > Math.Max(Math.Max(idHashIndex, readerDescIndex), locationIndex))
+                    if (row.Length > Math.Max(Math.Max(idHashIndex, readerDescIndex), Math.Max(locationIndex, timestampIndex >= 0 ? timestampIndex : -1)))
                     {
                         string userId = row[idHashIndex];
                         string reader = row[readerDescIndex];
                         string panel = row[locationIndex];
+                        
+                        // Process time data if available
+                        if (timestampIndex >= 0 && row.Length > timestampIndex && DateTime.TryParse(row[timestampIndex], out DateTime timestamp))
+                        {
+                            // Group by day for time chart
+                            DateTime dateOnly = timestamp.Date;
+                            if (!dailyCounts.ContainsKey(dateOnly))
+                                dailyCounts[dateOnly] = 0;
+                            dailyCounts[dateOnly]++;
+
+                            // Track hourly distribution
+                            int hour = timestamp.Hour;
+                            string dayOfWeek = timestamp.DayOfWeek.ToString();
+
+                            if (!hourlyActivity.ContainsKey(dayOfWeek))
+                                hourlyActivity[dayOfWeek] = new Dictionary<int, int>();
+                            
+                            if (!hourlyActivity[dayOfWeek].ContainsKey(hour))
+                                hourlyActivity[dayOfWeek][hour] = 0;
+                            
+                            hourlyActivity[dayOfWeek][hour]++;
+                        }
 
                         if (!string.IsNullOrEmpty(userId))
                         {
@@ -186,12 +774,130 @@ else
                         }
                     }
                 }
+
+                // Convert daily counts to sorted list for chart
+                activityTimeData = dailyCounts
+                    .Select(kv => new ActivityTimeEntry { Date = kv.Key, Count = kv.Value })
+                    .OrderBy(entry => entry.Date)
+                    .ToList();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error processing data: {ex.Message}");
+        }
+    }
+
+    private async Task RenderChartsAsync()
+    {
+        try
+        {
+
+            Console.WriteLine($"TopUsers count: {TopUsers.Count}");
+            Console.WriteLine($"TopPanels count: {TopPanels.Count}"); 
+            Console.WriteLine($"activityTimeData count: {activityTimeData.Count}");
+            await JSRuntime.InvokeVoidAsync("ensureCanvasElements");
+            if (TopUsers.Count == 0 || TopPanels.Count == 0)
+            {
+                Console.WriteLine("No data available to render charts");
+                return;
+            }
+            // Top Users Bar Chart
+            await JSRuntime.InvokeVoidAsync("renderBarChart", "userBarChart", 
+                TopUsers.Select(u => TruncateString(u.Key, 10)).ToArray(), 
+                TopUsers.Select(u => u.Value).ToArray(),
+                "rgba(13, 110, 253, 0.8)");
+
+            // Top Panels Bar Chart
+            await JSRuntime.InvokeVoidAsync("renderBarChart", "panelBarChart",
+                TopPanels.Select(p => TruncateString(p.Key, 10)).ToArray(),
+                TopPanels.Select(p => p.Value).ToArray(),
+                "rgba(25, 135, 84, 0.8)");
+
+            // Top Readers Bar Chart
+            await JSRuntime.InvokeVoidAsync("renderBarChart", "readerBarChart",
+                TopReaders.Select(r => TruncateString(r.Key, 10)).ToArray(),
+                TopReaders.Select(r => r.Value).ToArray(),
+                "rgba(13, 202, 240, 0.8)");
+
+            // Activity Over Time Chart
+            if (activityTimeData.Any())
+            {
+                await JSRuntime.InvokeVoidAsync("renderTimeChart", "activityTimeChart",
+                    activityTimeData.Select(a => a.Date.ToString("yyyy-MM-dd")).ToArray(),
+                    activityTimeData.Select(a => a.Count).ToArray());
+            }
+
+            // Panel Usage Pie Chart
+            var topPanelsForPie = panelCounts.OrderByDescending(x => x.Value).Take(8).ToList();
+            int otherPanelsCount = panelCounts.OrderByDescending(x => x.Value).Skip(8).Sum(x => x.Value);
             
+            var pieLabels = topPanelsForPie.Select(p => TruncateString(p.Key, 15)).ToList();
+            var pieValues = topPanelsForPie.Select(p => p.Value).ToList();
+            
+            if (otherPanelsCount > 0)
+            {
+                pieLabels.Add("Others");
+                pieValues.Add(otherPanelsCount);
+            }
+            
+            await JSRuntime.InvokeVoidAsync("renderPieChart", "panelPieChart", 
+                pieLabels.ToArray(), 
+                pieValues.ToArray());
+
+            // Render Heatmap Chart
+            await RenderHeatmapChartAsync();
+        }
+        catch (Exception ex)
+        {
+            
+            Console.WriteLine($"Error rendering charts: {ex.Message}");
+        }
+    }
+
+    private async Task RenderHeatmapChartAsync()
+    {
+        try
+        {
+            List<string> daysOfWeek = new List<string> { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
+            List<object> heatmapData = new List<object>();
+
+            foreach (string day in daysOfWeek)
+            {
+                if (hourlyActivity.ContainsKey(day))
+                {
+                    for (int hour = 0; hour < 24; hour++)
+                    {
+                        int value = hourlyActivity[day].ContainsKey(hour) ? hourlyActivity[day][hour] : 0;
+                        
+                        heatmapData.Add(new 
+                        { 
+                            day = day, 
+                            hour = hour.ToString() + ":00", 
+                            value = value 
+                        });
+                    }
+                }
+                else
+                {
+                    // Add empty data for days with no activity
+                    for (int hour = 0; hour < 24; hour++)
+                    {
+                        heatmapData.Add(new 
+                        { 
+                            day = day, 
+                            hour = hour.ToString() + ":00", 
+                            value = 0 
+                        });
+                    }
+                }
+            }
+
+            await JSRuntime.InvokeVoidAsync("renderHeatmap", "heatmapChart", heatmapData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error rendering heatmap: {ex.Message}");
         }
     }
 
@@ -206,6 +912,13 @@ else
     {
         CsvDataService.ClearData();
         Navigation.NavigateTo("/");
+    }
+
+    [JSInvokable]
+    public static Task NotifyLibrariesLoaded()
+    {
+        // This method will be called by JS when libraries are loaded
+        return Task.CompletedTask;
     }
 
     public void Dispose()

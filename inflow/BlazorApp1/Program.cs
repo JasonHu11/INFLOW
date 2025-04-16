@@ -2,6 +2,14 @@ using BlazorApp1.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddServerSideBlazor()
+    .AddHubOptions(options => {
+        options.ClientTimeoutInterval = TimeSpan.FromMinutes(5);
+        options.HandshakeTimeout = TimeSpan.FromMinutes(2);
+        options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+
+    });
+    
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
