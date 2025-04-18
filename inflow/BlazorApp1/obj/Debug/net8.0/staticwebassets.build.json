@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "AZ657l/TYdkae72A1CDgZOgoBeDAl5J65TIDbH3PRwQ=",
+  "Hash": "7qmWi6OveBeKkzz+ntVie4LxeDcz4Y4pKkbjft8fCKE=",
   "Source": "BlazorApp1",
   "BasePath": "_content/BlazorApp1",
   "Mode": "Default",
@@ -167,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\chartHelper.js"
+    },
+    {
+      "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\chartInterop.js",
+      "SourceId": "BlazorApp1",
+      "SourceType": "Discovered",
+      "ContentRoot": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\",
+      "BasePath": "_content/BlazorApp1",
+      "RelativePath": "chartInterop.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\chartInterop.js"
     },
     {
       "Identity": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\favicon.png",

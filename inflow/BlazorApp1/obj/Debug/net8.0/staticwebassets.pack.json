@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets\\chartHelper.js"
     },
     {
+      "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\chartInterop.js",
+      "PackagePath": "staticwebassets\\chartInterop.js"
+    },
+    {
       "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },
