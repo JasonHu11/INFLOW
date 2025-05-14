@@ -2,6 +2,8 @@
 @using YourProjectName.Services
 @implements IDisposable
 @inject NavigationManager Navigation
+@using MudBlazor
+@inject IJSRuntime JSRuntime
 
 <PageTitle>CSV Data</PageTitle>
 
@@ -21,9 +23,11 @@ else
         </button>
     </div>
 
+   
+
     @if (TopIdHash.Any())
     {
-        <div class="alert alert-info alert-dark">
+        <div class="alert alert-primary">
             <strong>Top 5 IDHASH values:</strong>
             <ul>
                 @foreach (var entry in TopIdHash)
@@ -36,7 +40,7 @@ else
 
     @if (TopDevId.Any())
     {
-        <div class="alert alert-secondary alert-dark">
+        <div class="alert alert-primary">
             <strong>Top 5 DEVID values:</strong>
             <ul>
                 @foreach (var entry in TopDevId)
@@ -49,7 +53,7 @@ else
 
     @if (TopMachine.Any())
     {
-        <div class="alert alert-warning alert-dark">
+        <div class="alert alert-primary">
             <strong>Top 5 MACHINE values:</strong>
             <ul>
                 @foreach (var entry in TopMachine)
@@ -60,6 +64,20 @@ else
         </div>
     }
 
+    @if (TopDaysOfWeek.Any())
+{
+    <div class="alert alert-primary">
+        <strong>Most Active Days of the Week:</strong>
+        <ul>
+            @foreach (var entry in TopDaysOfWeek)
+            {
+                <li>@entry.Key (appeared @entry.Value times)</li>
+            }
+        </ul>
+    </div>
+}
+
+@* 
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead class="table-dark">
@@ -82,29 +100,173 @@ else
                 }
             </tbody>
         </table>
-    </div>
+    </div> *@
 }
 
 @code {
     private List<KeyValuePair<string, int>> TopIdHash = new();
     private List<KeyValuePair<string, int>> TopDevId = new();
     private List<KeyValuePair<string, int>> TopMachine = new();
+    private List<KeyValuePair<string, int>> TopDaysOfWeek = new();
+
+    private bool chartsInitialized = false;
 
     protected override void OnInitialized()
+    {    
+        Console.WriteLine("OnInitialized called");
+    CsvDataService.DataLoaded += () =>
     {
-        CsvDataService.DataLoaded += StateHasChanged;
+        Console.WriteLine("DataLoaded event triggered");
+        StateHasChanged();
+    };
+    CalculateTopValues();
+    }
 
-        if (CsvDataService.Headers != null && CsvDataService.CsvData != null)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine($"OnAfterRenderAsync called (firstRender: {firstRender})");
+       try
+    {
+        if (firstRender && CsvDataService.Headers != null && CsvDataService.CsvData != null && !chartsInitialized)
         {
-            CalculateTopValues();
+            await LoadChartJsAsync();
+            await InitializeChartsAsync();
+            chartsInitialized = true;
         }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Exception in OnAfterRenderAsync: {ex.Message}");
+    }
+    }
+
+    private async Task LoadChartJsAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("loadChartJs");
+    }
+
+    private async Task InitializeChartsAsync()
+    {
+        if (TopIdHash.Any())
+            await CreateChartAsync("idHashChart", "IDHASH Activities", TopIdHash, "#17a2b8");
+
+        if (TopDevId.Any())
+            await CreateChartAsync("devIdChart", "DEVID Activities", TopDevId, "#6c757d");
+
+        if (TopMachine.Any())
+            await CreateChartAsync("machineChart", "MACHINE Activities", TopMachine, "#ffc107");
+    }
+
+    private async Task CreateChartAsync(string canvasId, string title, List<KeyValuePair<string, int>> data, string backgroundColor)
+    {
+        var labels = data.Select(d => d.Key.Length > 10 ? d.Key.Substring(0, 10) + "..." : d.Key).ToArray();
+        var values = data.Select(d => d.Value).ToArray();
+
+        var chartConfig = new
+        {
+            type = "bar",
+            data = new
+            {
+                labels = labels,
+                datasets = new[]
+                {
+                    new
+                    {
+                        label = "Occurrences",
+                        data = values,
+                        backgroundColor = backgroundColor,
+                        borderColor = backgroundColor,
+                        borderWidth = 1
+                    }
+                }
+            },
+            options = new
+            {
+                responsive = true,
+                maintainAspectRatio = false,
+                indexAxis = "y",
+                plugins = new
+                {
+                    title = new
+                    {
+                        display = true,
+                        text = title
+                    },
+                    legend = new
+                    {
+                        display = false
+                    }
+                },
+                scales = new
+                {
+                    y = new
+                    {
+                        ticks = new
+                        {
+                            color = "#333333",
+                            font = new
+                            {
+                                size = 12
+                            }
+                        }
+                    },
+                    x = new
+                    {
+                        beginAtZero = true
+                    }
+                }
+            }
+        };
+
+        await JSRuntime.InvokeVoidAsync("createChart", canvasId, chartConfig);
+    }
+
+   private List<KeyValuePair<string, int>> GetTopDaysOfWeek(string dateColumnName)
+    {
+        var columnIndex = CsvDataService.Headers.FindIndex(h => h.Equals(dateColumnName, StringComparison.OrdinalIgnoreCase));
+        if (columnIndex == -1)
+            return new List<KeyValuePair<string, int>>();
+
+        var dayCounts = new Dictionary<string, int>();
+
+        foreach (var row in CsvDataService.CsvData)
+        {
+            if (row.Count() > columnIndex)
+            {
+                var dateStr = row[columnIndex];
+                if (DateTime.TryParse(dateStr, null, System.Globalization.DateTimeStyles.AdjustToUniversal, out var date))
+                {
+                    var day = date.DayOfWeek.ToString();
+                    if (dayCounts.ContainsKey(day))
+                        dayCounts[day]++;
+                    else
+                        dayCounts[day] = 1;
+                }
+            }
+        }
+
+        return dayCounts
+            .OrderByDescending(kv => kv.Value)
+            .ToList();
     }
 
     private void CalculateTopValues()
     {
-        TopIdHash = GetTopOccurrences("IDHASH");
-        TopDevId = GetTopOccurrences("DEVID");
-        TopMachine = GetTopOccurrences("MACHINE");
+        if (CsvDataService.Headers == null || CsvDataService.CsvData == null)
+    {
+        Console.WriteLine("CsvDataService data is not loaded");
+        return;
+    }
+
+    TopIdHash = GetTopOccurrences("IDHASH");
+    TopDevId = GetTopOccurrences("DEVID");
+    TopMachine = GetTopOccurrences("MACHINE");
+    TopDaysOfWeek = GetTopDaysOfWeek("EVENT_TIME_UTC"); // Replace "DATE" with your actual header
+
+
+    Console.WriteLine($"TopIdHash: {string.Join(", ", TopIdHash.Select(kv => $"{kv.Key}={kv.Value}"))}");
+    Console.WriteLine($"TopDevId: {string.Join(", ", TopDevId.Select(kv => $"{kv.Key}={kv.Value}"))}");
+    Console.WriteLine($"TopMachine: {string.Join(", ", TopMachine.Select(kv => $"{kv.Key}={kv.Value}"))}");
     }
 
     private List<KeyValuePair<string, int>> GetTopOccurrences(string columnName)
@@ -144,6 +306,7 @@ else
 
     public void Dispose()
     {
+        Console.WriteLine("Dispose called");
         CsvDataService.DataLoaded -= StateHasChanged;
     }
 }

@@ -1,0 +1,13 @@
+<canvas id="myChart" width="400" height="200"></canvas>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("drawChart");
+        }
+    }
+
+    [Inject] IJSRuntime JS { get; set; }
+}

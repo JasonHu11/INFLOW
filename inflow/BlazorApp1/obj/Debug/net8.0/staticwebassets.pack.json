@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets\\bootstrap\\bootstrap.min.css.map"
     },
     {
+      "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\chart-interop.js",
+      "PackagePath": "staticwebassets\\chart-interop.js"
+    },
+    {
       "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\chartHelper.js",
       "PackagePath": "staticwebassets\\chartHelper.js"
     },
@@ -25,12 +29,20 @@
       "PackagePath": "staticwebassets\\chartInterop.js"
     },
     {
+      "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\charts.js",
+      "PackagePath": "staticwebassets\\charts.js"
+    },
+    {
       "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\favicon.png",
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {
       "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\js\\activityCharts.js",
       "PackagePath": "staticwebassets\\js\\activityCharts.js"
+    },
+    {
+      "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\js\\chart-loader.js",
+      "PackagePath": "staticwebassets\\js\\chart-loader.js"
     },
     {
       "Id": "c:\\Users\\RK03-B1225\\Documents\\GitHub\\INFLOWDATAWORK\\INFLOW\\inflow\\BlazorApp1\\wwwroot\\js\\site.js",

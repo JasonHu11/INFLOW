@@ -9,18 +9,37 @@
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="BlazorApp1.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <!-- MUDBLAZOR STUFF -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <HeadOutlet />
 </head>
 
 <body>
     <Routes />
-    <script src="_framework/blazor.web.js"></script>
-    <script src="js/site.js" asp-append-version="true"></script>
-    <!-- Add Chart.js from CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    @* MUDBLAZOR STUFF *@
+
+    <script>
+        Blazor.start().then(() => {
+            Blazor.defaultReconnectionHandler._reconnectionDisplay = {
+                show: () => {},
+                update: (d) => {},
+                rejected: (d) => document.location.reload()
+            };
+        });
+    </script>
+
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="chart-interop.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Add your custom JS file -->
+    <script src="_framework/blazor.web.js"></script>
+    <script src="js/site.js" asp-append-version="true"></script>
+
+    <!-- Add Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="charts.js"></script>
     <script src="js/activityCharts.js"></script>
 </body>
 

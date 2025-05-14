@@ -1,4 +1,5 @@
 using BlazorApp1.Components;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddServerSideBlazor()
 
     });
     
+//ADD MUDBLAZOR
+builder.Services.AddMudServices();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
